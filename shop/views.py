@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from .models import Category, Product
+from cart.forms import CartAddProductForm
+from cart.views import Cart
 
 
 class ProductViewList(View):
@@ -12,10 +14,13 @@ class ProductViewList(View):
             category = get_object_or_404(Category, slug=category_slug)
             products = Product.objects.filter(category=category)
 
-        return render(request, 'shop.html', context={
+        cart = Cart(request)
+
+        return render(request, 'shop/shop.html', context={
             'category': category,
             'categories': categories,
             'products': products,
+            'cart': cart,
         })
 
 
@@ -24,8 +29,13 @@ class ProductDetailView(View):
         product = get_object_or_404(Product, id=product_id, slug=product_slug, available=True)
         categories = Category.objects.all()
 
-        return render(request, 'product.html', context={
+        cart_form = CartAddProductForm()
+        cart = Cart(request)
+
+        return render(request, 'shop/product.html', context={
             'product': product,
             'categories': categories,
+            'cart_form': cart_form,
+            'cart': cart
         })
 
